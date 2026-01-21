@@ -1,0 +1,79 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/hung_hypebeast
+    username: postgres
+    password: sa123
+  jpa:
+    hibernate:
+      ddl-auto: none
+    properties:
+      hibernate:
+        format_sql: true
+        default_batch_fetch_size: 50
+        jdbc:
+          batch_size: 50
+  mail:
+    host: smtp.gmail.com       # TODO: sửa nếu không dùng Gmail
+    port: 587
+    username: tientmhe182319@fpt.edu.vn     # TODO: đổi thành email thật
+    password: sjjo zaxk dltf ydwx         # TODO: đổi thành app password/SMTP password
+    properties:
+      mail.smtp.auth: true
+      mail.smtp.starttls.enable: true
+
+logging:
+  level:
+    org.hibernate.SQL: debug
+    org.hibernate.type.descriptor.sql: trace
+
+server:
+  port: 8080
+
+app:
+  reservation:
+    # Thời gian giữ tồn kho cho một reservation (phút), có thể chỉnh mà không cần sửa code
+    ttl-minutes: 10
+  cart-context:
+    # Các path áp dụng CartContextInterceptor; có thể chỉnh mà không cần sửa code
+    paths: /api/cart/**,/api/checkout/**
+
+  admin:
+    # API key đơn giản bảo vệ các endpoint /api/admin/**
+    # Khi gọi API admin, client phải gửi header: X-Admin-Token: ${app.admin.api-key}
+    api-key: "hung_hypebeast"
+
+  mail:
+    # Địa chỉ From hiển thị khi gửi mail (nên trùng spring.mail.username)
+    from: "YOUR_EMAIL@gmail.com"      # TODO: đổi thành email thật
+
+  tracking:
+    # Base URL dùng trong email để khách bấm vào theo dõi trạng thái đơn
+    # Mặc định trỏ về API backend, bạn có thể đổi sang URL FE
+    base-url: "http://localhost:8080/api/orders/track"
+
+  order:
+    # Thời gian tối đa cho đơn ở trạng thái PENDING trước khi tự động hủy (phút)
+    # Nên để cùng giá trị với app.reservation.ttl-minutes để thời gian giữ hàng
+    # và thời gian tự động hủy đơn luôn khớp nhau.
+    auto-cancel-minutes: 10
+
+sepay:
+  # Bật/tắt tích hợp thật với SePay
+  enabled: true
+
+  # Base URL để tạo link checkout
+  # Sandbox: https://pgapi-sandbox.sepay.vn
+  # Production: https://pgapi.sepay.vn
+  base-url: "https://pgapi-sandbox.sepay.vn"
+
+  # Thông tin merchant từ màn hình tích hợp SePay
+  merchant-id: "SP-TEST-TM849553"
+  secret-key: "spsk_test_CvGzsAKRC9GFSTkRGQyYzVsJG2p8abPm"
+
+  # Các URL callback khi redirect (dev: trỏ về backend local)
+  success-url: "http://localhost:8080/payment/success"
+  error-url: "http://localhost:8080/payment/error"
+  cancel-url: "http://localhost:8080/payment/cancel"
+
+  # IPN callback URL (sau này dùng để SePay bắn JSON về tự động cập nhật đơn)
+  callback-url: "http://localhost:8080/payment/ipn"

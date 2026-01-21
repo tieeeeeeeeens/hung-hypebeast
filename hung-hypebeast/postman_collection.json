@@ -1,0 +1,315 @@
+{
+  "info": {
+    "name": "HUNG HYPEBEAST Backend API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "description": "Collection HUNG HYPEBEAST Backend API"
+  },
+  "item": [
+    {
+      "name": "0. Session",
+      "item": [
+        {
+          "name": "Create Session",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 200', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "const data = pm.response.json();",
+                  "if (data && data.sessionId) {",
+                  "  pm.environment.set('sessionId', data.sessionId);",
+                  "}",
+                  ""
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/session",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "session"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "1. Catalog",
+      "item": [
+        {
+          "name": "Get Categories",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/products/categories",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "products", "categories"]
+            }
+          }
+        },
+        {
+          "name": "Get Products By Category",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/products/categories/{{categoryId}}?page=0&size=20",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "products", "categories", "{{categoryId}}"],
+              "query": [
+                {"key": "page", "value": "0"},
+                {"key": "size", "value": "20"},
+                {"key": "minPrice", "value": "", "disabled": true},
+                {"key": "maxPrice", "value": "", "disabled": true}
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Product Detail",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/products/{{productId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "products", "{{productId}}"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "2. Cart",
+      "item": [
+        {
+          "name": "Get Cart",
+          "request": {
+            "method": "GET",
+            "header": [
+              {"key": "X-Session-Id", "value": "{{sessionId}}"}
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/cart",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "cart"]
+            }
+          }
+        },
+        {
+          "name": "Add Item",
+          "request": {
+            "method": "POST",
+            "header": [
+              {"key": "Content-Type", "value": "application/json"},
+              {"key": "X-Session-Id", "value": "{{sessionId}}"}
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"variantId\": 1,\n  \"quantity\": 1\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/cart/items",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "cart", "items"]
+            }
+          }
+        },
+        {
+          "name": "Update Item Quantity",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {"key": "Content-Type", "value": "application/json"},
+              {"key": "X-Session-Id", "value": "{{sessionId}}"}
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"quantity\": 2\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/cart/items/{{cartItemId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "cart", "items", "{{cartItemId}}"]
+            }
+          }
+        },
+        {
+          "name": "Remove Item",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {"key": "X-Session-Id", "value": "{{sessionId}}"}
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/cart/items/{{cartItemId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "cart", "items", "{{cartItemId}}"]
+            }
+          }
+        },
+        {
+          "name": "Clear Cart",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {"key": "X-Session-Id", "value": "{{sessionId}}"}
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/cart",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "cart"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "3. Checkout & Orders (User)",
+      "item": [
+        {
+          "name": "Checkout - Create Order",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 200', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "const data = pm.response.json();",
+                  "if (data && data.trackingToken) {",
+                  "  pm.environment.set('trackingToken', data.trackingToken);",
+                  "}",
+                  "if (data && data.id) {",
+                  "  pm.environment.set('orderId', data.id);",
+                  "}",
+                  ""
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {"key": "Content-Type", "value": "application/json"},
+              {"key": "X-Session-Id", "value": "{{sessionId}}"}
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"customerName\": \"Nguyen Van A\",\n  \"customerPhone\": \"0900000000\",\n  \"customerEmail\": \"a@example.com\",\n  \"customerAddress\": \"123 Le Loi, Q1\",\n  \"paymentMethod\": \"COD\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/checkout",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "checkout"]
+            }
+          }
+        },
+        {
+          "name": "Order - Track By Token",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/orders/track?token={{trackingToken}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "orders", "track"],
+              "query": [
+                {"key": "token", "value": "{{trackingToken}}"}
+              ]
+            }
+          }
+        },
+        {
+          "name": "Order - Cancel",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/orders/{{orderId}}/cancel",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "orders", "{{orderId}}", "cancel"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "4. Admin Orders",
+      "item": [
+        {
+          "name": "Admin - List Orders",
+          "request": {
+            "method": "GET",
+            "header": [
+              {"key": "X-Admin-Token", "value": "{{adminToken}}"}
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/admin/orders?page=0&size=20",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "admin", "orders"],
+              "query": [
+                {"key": "page", "value": "0"},
+                {"key": "size", "value": "20"},
+                {"key": "status", "value": "PENDING", "disabled": true}
+              ]
+            }
+          }
+        },
+        {
+          "name": "Admin - Get Order Detail",
+          "request": {
+            "method": "GET",
+            "header": [
+              {"key": "X-Admin-Token", "value": "{{adminToken}}"}
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/admin/orders/{{orderId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "admin", "orders", "{{orderId}}"]
+            }
+          }
+        },
+        {
+          "name": "Admin - Update Order Status",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {"key": "X-Admin-Token", "value": "{{adminToken}}"}
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/admin/orders/{{orderId}}/status?status=CONFIRMED",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "admin", "orders", "{{orderId}}", "status"],
+              "query": [
+                {"key": "status", "value": "CONFIRMED"}
+              ]
+            }
+          }
+        }
+      ]
+    }
+  ],
+  "variable": [
+    {"key": "baseUrl", "value": "http://localhost:8080"},
+    {"key": "sessionId", "value": ""},
+    {"key": "categoryId", "value": "1"},
+    {"key": "productId", "value": "1"},
+    {"key": "cartItemId", "value": "1"},
+    {"key": "orderId", "value": ""},
+    {"key": "trackingToken", "value": ""},
+    {"key": "adminToken", "value": "changeme-admin-token"}
+  ]
+}
